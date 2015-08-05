@@ -60,12 +60,74 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImgnetContext.cs" />
+    <Compile Include="Manager.cs" />
+    <Compile Include="Migrations\201508051020527_initAdds.cs" />
+    <Compile Include="Migrations\201508051020527_initAdds.Designer.cs">
+      <DependentUpon>201508051020527_initAdds.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508051043119_testChildren.cs" />
+    <Compile Include="Migrations\201508051043119_testChildren.Designer.cs">
+      <DependentUpon>201508051043119_testChildren.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508051225440_addLevel.cs" />
+    <Compile Include="Migrations\201508051225440_addLevel.Designer.cs">
+      <DependentUpon>201508051225440_addLevel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508051454577_addLineNo.cs" />
+    <Compile Include="Migrations\201508051454577_addLineNo.Designer.cs">
+      <DependentUpon>201508051454577_addLineNo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508051525248_hideUrlAndIndex.cs" />
+    <Compile Include="Migrations\201508051525248_hideUrlAndIndex.Designer.cs">
+      <DependentUpon>201508051525248_hideUrlAndIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508051817047_switchToInt.cs" />
+    <Compile Include="Migrations\201508051817047_switchToInt.Designer.cs">
+      <DependentUpon>201508051817047_switchToInt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508051820196_fix.cs" />
+    <Compile Include="Migrations\201508051820196_fix.Designer.cs">
+      <DependentUpon>201508051820196_fix.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201508051020527_initAdds.resx">
+      <DependentUpon>201508051020527_initAdds.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508051043119_testChildren.resx">
+      <DependentUpon>201508051043119_testChildren.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508051225440_addLevel.resx">
+      <DependentUpon>201508051225440_addLevel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508051454577_addLineNo.resx">
+      <DependentUpon>201508051454577_addLineNo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508051525248_hideUrlAndIndex.resx">
+      <DependentUpon>201508051525248_hideUrlAndIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508051817047_switchToInt.resx">
+      <DependentUpon>201508051817047_switchToInt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508051820196_fix.resx">
+      <DependentUpon>201508051820196_fix.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="data\gloss.txt" />
+    <Content Include="data\imagenet.synset.txt" />
+    <Content Include="data\ReleaseStatus.xml" />
+    <Content Include="data\structure_released.xml" />
+    <Content Include="data\wordnet.is_a.txt" />
+    <Content Include="data\words.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
