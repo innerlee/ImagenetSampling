@@ -94,6 +94,14 @@
     <Compile Include="Migrations\201508051838495_removeSynIdTable.Designer.cs">
       <DependentUpon>201508051838495_removeSynIdTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201508051913523_whatwhat.cs" />
+    <Compile Include="Migrations\201508051913523_whatwhat.Designer.cs">
+      <DependentUpon>201508051913523_whatwhat.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508052336381_addLeafHeight.cs" />
+    <Compile Include="Migrations\201508052336381_addLeafHeight.Designer.cs">
+      <DependentUpon>201508052336381_addLeafHeight.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -126,6 +134,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201508051838495_removeSynIdTable.resx">
       <DependentUpon>201508051838495_removeSynIdTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508051913523_whatwhat.resx">
+      <DependentUpon>201508051913523_whatwhat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508052336381_addLeafHeight.resx">
+      <DependentUpon>201508052336381_addLeafHeight.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

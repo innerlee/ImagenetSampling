@@ -20,6 +20,32 @@ namespace Imagenet
 
         int taken = 0;
 
+        public void CountImgs()
+        {
+            var pl = (from i in db.ImgIds
+                          //orderby i.SynsetId
+                      group i by i.SynsetId into grp
+                      select new { SynsetId = grp.Key, count = grp.Count() }).OrderBy(a => a.SynsetId).ToList();
+
+            var p2 = db.Synsets.OrderBy(s => s.SynsetId).ToList();
+
+            var count = 0;
+            var j = 0;
+            for (int i = 0; i < pl.Count; i++)
+            {
+                while (p2[j].SynsetId != pl[i].SynsetId)
+                {
+                    j++;
+                }
+                p2[j].ImgCount = pl[i].count;
+                count++;
+
+                if (count % 10000 == 0) Console.WriteLine(count);
+            }
+            db.SaveChanges();
+            
+        }
+
         public void MoveDataToInt()
         {
             var list = db.Synsets.ToList();

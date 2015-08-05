@@ -11,7 +11,7 @@ namespace Imagenet
         static void Main(string[] args)
         {
             var m = new Manager();
-            m.BatchAddImageIntVersion();
+            m.CountImgs();
 
             Console.WriteLine("done.");
             Console.ReadLine();

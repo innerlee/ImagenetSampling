@@ -38,7 +38,9 @@ namespace Imagenet
         public bool? IsAvailable { get; set; }
         public int? Level { get; set; }
         public int? ImgCount { get; set; }
+        public int? TotalCount { get; set; }
         public int? SynsetId { get; set; }
+        public int? LeafHeight { get; set; }
 
         public string ParentId { get; set; }
         [ForeignKey("ParentId")]
