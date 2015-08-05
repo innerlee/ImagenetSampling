@@ -38,8 +38,8 @@ namespace Imagenet
             var filename = linenoInt;
 
             string[] lines = System.IO.File.ReadAllLines(filename);
-            var imgs = lines.Select(l => int.Parse(l)).ToList();
-            
+            var imgs = lines.Select(l => new ImgId { SynsetId = int.Parse(l) }).ToList();
+
             var count = imgs.Count / capacity;
 
             var i = 0;
