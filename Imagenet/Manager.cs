@@ -38,52 +38,18 @@ namespace Imagenet
             var filename = linenoInt;
 
             string[] lines = System.IO.File.ReadAllLines(filename);
-            var imgs = lines.Select(l => new Image { Wnid = l }).ToList();
+            var imgs = lines.Select(l => int.Parse(l)).ToList();
+            
+            var count = imgs.Count / capacity;
 
-            db.BulkInsert(imgs);
-            //lines = null;
-            //var count = imgs.Count / capacity;
+            var i = 0;
+            for (; i < count; i++)
+            {
+                db.BulkInsert(imgs.GetRange(i * capacity, capacity));
+                Console.WriteLine(i * capacity);
 
-            //var i = 0;
-            //for (; i < count; i++)
-            //{
-            //    using (var context = new ImgnetContext())
-            //    {
-            //        context.Configuration.AutoDetectChangesEnabled = false;
-            //        context.Configuration.ValidateOnSaveEnabled = false;
-            //        context.Images.AddRange(imgs.GetRange(i * capacity, capacity));
-            //        context.SaveChanges();
-            //        Console.WriteLine(i * capacity);
-            //    }
-            //}
-            //using (var context = new ImgnetContext())
-            //{
-            //    context.Images.AddRange(imgs.GetRange(i * capacity, imgs.Count % capacity));
-            //    context.SaveChanges();
-            //}
-
-
-            //var synsets = db.Synsets.OrderBy(s => s.Wnid).ToList();
-
-            //var L = glosses.Count;
-            //if (synsets.Count != L)
-            //{
-            //    Console.WriteLine("lines count not match");
-            //    return;
-            //}
-
-            //for (int i = 0; i < L; i++)
-            //{
-            //    if (synsets[i].Wnid == glosses[i].Wnid)
-            //        synsets[i].Glosses = glosses[i].Glosses;
-            //    else
-            //        Console.WriteLine("not match line " + i.ToString());
-            //}
-
-            //db.SaveChanges();
-            Console.WriteLine("done.");
-            Console.ReadLine();
-
+            }
+            db.BulkInsert(imgs.GetRange(i * capacity, imgs.Count % capacity));
         }
 
         //private void ProcessLinesOfImgs(List<string> lines)
