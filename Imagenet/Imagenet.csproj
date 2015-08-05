@@ -90,6 +90,10 @@
     <Compile Include="Migrations\201508051820196_fix.Designer.cs">
       <DependentUpon>201508051820196_fix.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201508051838495_removeSynIdTable.cs" />
+    <Compile Include="Migrations\201508051838495_removeSynIdTable.Designer.cs">
+      <DependentUpon>201508051838495_removeSynIdTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -119,6 +123,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201508051820196_fix.resx">
       <DependentUpon>201508051820196_fix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508051838495_removeSynIdTable.resx">
+      <DependentUpon>201508051838495_removeSynIdTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

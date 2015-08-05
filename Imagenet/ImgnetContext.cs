@@ -25,7 +25,7 @@ namespace Imagenet
 
         public virtual DbSet<Synset> Synsets { get; set; }
         public virtual DbSet<Image> Images { get; set; }
-        public virtual DbSet<SynId> SynIds { get; set; }
+        //public virtual DbSet<SynId> SynIds { get; set; }
         public virtual DbSet<ImgId> ImgIds { get; set; }
     }
 
@@ -38,6 +38,7 @@ namespace Imagenet
         public bool? IsAvailable { get; set; }
         public int? Level { get; set; }
         public int? ImgCount { get; set; }
+        public int? SynsetId { get; set; }
 
         public string ParentId { get; set; }
         [ForeignKey("ParentId")]
@@ -46,30 +47,29 @@ namespace Imagenet
         public List<Synset> Children { get; set; }
         [InverseProperty("Synset")]
         public List<Image> Images { get; set; }
-        [InverseProperty("Synset")]
-        public List<SynId> SynIds { get; set; }
+        //[InverseProperty("Synset")]
+        //public List<SynId> SynIds { get; set; }
     }
 
-    public class SynId
-    {
-        [Key]
-        public int SynsetId { get; set; }
-        public string Wnid { get; set; }
+    //public class SynId
+    //{
+    //    [Key]
+    //    public int SynsetId { get; set; }
+    //    public string Wnid { get; set; }
 
-        [ForeignKey("Wnid")]
-        public virtual Synset Synset { get; set; }
+    //    [ForeignKey("Wnid")]
+    //    public virtual Synset Synset { get; set; }
 
-        [InverseProperty("SynId")]
-        public List<ImgId> ImgIds { get; set; }
-    }
+    //    [InverseProperty("SynId")]
+    //    public List<ImgId> ImgIds { get; set; }
+    //}
 
     public class ImgId
     {
         [Key]
         public int ImageId { get; set; }
+        [Index]
         public int? SynsetId { get; set; }
-        [ForeignKey("SynsetId")]
-        public virtual SynId SynId { get; set; }
     }
 
     public class Image

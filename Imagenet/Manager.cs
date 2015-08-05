@@ -14,10 +14,77 @@ namespace Imagenet
         string path = @"D:\Backup\Source\Repos\Imagenet\Imagenet\Imagenet\data\";
         string imgpath = @"C:\imagenet_fall11_urls.txt";
         string lineno = @"D:\lineNo.txt";
+        string linenoInt = @"D:\lineNoInt.txt";
         //List<string> lines;
         int capacity = 100000;
 
         int taken = 0;
+
+        public void MoveDataToInt()
+        {
+            var list = db.Synsets.ToList();
+            foreach (var s in list)
+            {
+                s.SynsetId = int.Parse(s.Wnid.Substring(1));
+            }
+
+            db.SaveChanges();
+
+        }
+
+
+        public void BatchAddImageIntVersion()
+        {
+            var filename = linenoInt;
+
+            string[] lines = System.IO.File.ReadAllLines(filename);
+            var imgs = lines.Select(l => new Image { Wnid = l }).ToList();
+
+            db.BulkInsert(imgs);
+            //lines = null;
+            //var count = imgs.Count / capacity;
+
+            //var i = 0;
+            //for (; i < count; i++)
+            //{
+            //    using (var context = new ImgnetContext())
+            //    {
+            //        context.Configuration.AutoDetectChangesEnabled = false;
+            //        context.Configuration.ValidateOnSaveEnabled = false;
+            //        context.Images.AddRange(imgs.GetRange(i * capacity, capacity));
+            //        context.SaveChanges();
+            //        Console.WriteLine(i * capacity);
+            //    }
+            //}
+            //using (var context = new ImgnetContext())
+            //{
+            //    context.Images.AddRange(imgs.GetRange(i * capacity, imgs.Count % capacity));
+            //    context.SaveChanges();
+            //}
+
+
+            //var synsets = db.Synsets.OrderBy(s => s.Wnid).ToList();
+
+            //var L = glosses.Count;
+            //if (synsets.Count != L)
+            //{
+            //    Console.WriteLine("lines count not match");
+            //    return;
+            //}
+
+            //for (int i = 0; i < L; i++)
+            //{
+            //    if (synsets[i].Wnid == glosses[i].Wnid)
+            //        synsets[i].Glosses = glosses[i].Glosses;
+            //    else
+            //        Console.WriteLine("not match line " + i.ToString());
+            //}
+
+            //db.SaveChanges();
+            Console.WriteLine("done.");
+            Console.ReadLine();
+
+        }
 
         //private void ProcessLinesOfImgs(List<string> lines)
         //{

@@ -10,6 +10,11 @@ namespace Imagenet
     {
         static void Main(string[] args)
         {
+            var m = new Manager();
+            m.MoveDataToInt();
+
+            Console.WriteLine("done.");
+            Console.ReadLine();
         }
     }
 }
