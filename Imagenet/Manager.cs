@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EntityFramework.BulkInsert.Extensions;
+using System.IO;
 
 namespace Imagenet
 {
@@ -16,6 +17,7 @@ namespace Imagenet
         string lineno = @"D:\lineNo.txt";
         string linenoInt = @"D:\lineNoInt.txt";
         string output = @"D:\";
+        string imgdir = @"D:\imgnetimg\";
         //List<string> lines;
         int capacity = 100000;
 
@@ -29,6 +31,9 @@ namespace Imagenet
 
         public void DownloadImages(string file)
         {
+            var salt = DateTime.Now.ToString("MMddHHmmss");
+            var baseDir = imgdir + salt + "\\";
+            Directory.CreateDirectory(baseDir);
 
         }
 
