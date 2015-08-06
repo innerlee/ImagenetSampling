@@ -36,9 +36,19 @@ namespace Imagenet
             public string info;
         }
 
+        public void BatchResizeImg(string path)
+        {
+            if (path == "") path = @"D:\testimg\";
+            var files = Directory.GetFiles(path).Select(f => f.ToLower()).Where(f => f.EndsWith(".jpeg")).ToList();
+            foreach (var f in files)
+            {
+                ResizeImg(f);
+            }
+        }
+
         public void ResizeImg(string file)
         {
-            var replace = false;
+            var replace = true;
 
             if (file == "") file = @"D:\img.jpeg";
             var outfile = file;
@@ -80,7 +90,7 @@ namespace Imagenet
                             }
                         }
                     }
-                    else
+                    else if (!replace)
                     {
                         File.Copy(file, outfile);
                     }

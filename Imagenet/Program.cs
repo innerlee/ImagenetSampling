@@ -12,7 +12,7 @@ namespace Imagenet
         {
             var m = new Manager();
             //m.Random100();
-            m.ResizeImg("");
+            m.BatchResizeImg("");
 
             Console.WriteLine("done.");
             Console.ReadLine();
