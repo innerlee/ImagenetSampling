@@ -27,7 +27,10 @@ namespace Imagenet
             public string info;
         }
 
-        
+        public void DownloadImages(string file)
+        {
+
+        }
 
         public void Top100()
         {
