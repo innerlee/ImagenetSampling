@@ -20,6 +20,63 @@ namespace Imagenet
 
         int taken = 0;
 
+        public void InitLeafHeight()
+        {
+            var list = db.Synsets.ToList();
+            foreach (var s in list)
+            {
+                if (s.Children == null) s.LeafHeight = 0;
+            }
+            db.SaveChanges();
+        }
+
+        public void ComputeLeafHeight()
+        {
+            var modified = 0;
+            var list = db.Synsets.ToList();
+            foreach (var s in list)
+            {
+                if (s.Children == null) continue;
+                var num = s.Children.Max(c => c.LeafHeight) + 1;
+                if (s.LeafHeight != num)
+                {
+                    s.LeafHeight = num;
+                    modified++;
+                }
+            }
+            Console.WriteLine("modifiled: " + modified.ToString());
+            db.SaveChanges();
+        }
+
+        public void InitTotalCount()
+        {
+            var list = db.Synsets.ToList();
+            foreach (var s in list)
+            {
+                //s.TotalCount = s.ImgCount ?? 0;
+                if (s.ImgCount == null) s.ImgCount = 0;
+            }
+            db.SaveChanges();
+        }
+
+        public void ComputeTotalCount()
+        {
+            var modified = 0;
+            var list = db.Synsets.ToList();
+            foreach (var s in list)
+            {
+                if (s.Children == null) continue;
+                var num = s.Children.Sum(c => c.ImgCount);
+                if (s.TotalCount != num)
+                {
+                    s.TotalCount = num;
+                    modified++;
+                }
+            }
+            Console.WriteLine("modifiled: " + modified.ToString());
+            db.SaveChanges();
+        }
+
         public void CountImgs()
         {
             var pl = (from i in db.ImgIds
@@ -43,7 +100,7 @@ namespace Imagenet
                 if (count % 10000 == 0) Console.WriteLine(count);
             }
             db.SaveChanges();
-            
+
         }
 
         public void MoveDataToInt()
