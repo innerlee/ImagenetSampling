@@ -11,8 +11,8 @@ namespace Imagenet
         static void Main(string[] args)
         {
             var m = new Manager();
-            m.Random100();
-            //m.DownloadImages("");
+            //m.Random100();
+            m.ResizeImg("");
 
             Console.WriteLine("done.");
             Console.ReadLine();
