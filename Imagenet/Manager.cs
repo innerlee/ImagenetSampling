@@ -12,6 +12,7 @@ using ImageProcessor.Imaging.Formats;
 using System.Drawing;
 using ImageProcessor;
 using ImageProcessor.Imaging;
+using ImageResizer;
 
 namespace Imagenet
 {
@@ -37,37 +38,54 @@ namespace Imagenet
 
         public void ResizeImg(string file)
         {
+            var replace = false;
+
             if (file == "") file = @"D:\img.jpeg";
-            var outfile = file.Replace(".jpeg", "_out" + DateTime.Now.ToString("MMddHHmmss") + ".jpeg");
+            var outfile = file;
+            if (!replace)
+                outfile = file.Replace(".jpeg", "_out" + DateTime.Now.ToString("MMddHHmmss") + ".jpeg");
 
             var minDimMax = 256;
 
             byte[] photoBytes = File.ReadAllBytes(file);
-            // Format is automatically detected though can be changed.
-            ISupportedImageFormat format = new JpegFormat { Quality = 70 };
-
-            Size size1 = new Size(minDimMax, minDimMax * 10);
-            Size size2 = new Size(minDimMax * 10, minDimMax);
-
-            var resize1 = new ResizeLayer(size1, ResizeMode.Max, upscale: false);
-            var resize2 = new ResizeLayer(size2, ResizeMode.Max, upscale: false);
 
             using (MemoryStream inStream = new MemoryStream(photoBytes))
             {
-                using (MemoryStream outStream = new MemoryStream())
+                using (var img = System.Drawing.Image.FromStream(inStream))
                 {
-                    // Initialize the ImageFactory using the overload to preserve EXIF metadata.
-                    using (ImageFactory imageFactory = new ImageFactory(preserveExifData: true))
+                    var w = img.Width;
+                    var h = img.Height;
+                    if (w > minDimMax && h > minDimMax)
                     {
-                        // Load, resize, set the format and quality and save an image.
-                        imageFactory.Load(inStream)
-                                    .Resize(resize1)
-                                    .Resize(resize2)
-                                    .Format(format)
-                                    .Save(outfile);
+                        // Format is automatically detected though can be changed.
+                        ISupportedImageFormat format = new JpegFormat { Quality = 70 };
+
+                        Size size1 = new Size(minDimMax, minDimMax * 10);
+                        Size size2 = new Size(minDimMax * 10, minDimMax);
+
+                        var resize1 = new ResizeLayer(size1, ResizeMode.Max, upscale: false);
+                        var resize2 = new ResizeLayer(size2, ResizeMode.Max, upscale: false);
+                        ResizeLayer layer = resize1;
+                        layer = w < h ? resize1 : resize2;
+                        using (MemoryStream outStream = new MemoryStream())
+                        {
+                            // Initialize the ImageFactory using the overload to preserve EXIF metadata.
+                            using (ImageFactory imageFactory = new ImageFactory(preserveExifData: true))
+                            {
+                                // Load, resize, set the format and quality and save an image.
+                                imageFactory.Load(inStream)
+                                            .Resize(layer)
+                                            .Format(format)
+                                            .Save(outfile);
+                            }
+                        }
                     }
-                    // Do something with the stream.
+                    else
+                    {
+                        File.Copy(file, outfile);
+                    }
                 }
+
             }
         }
 
