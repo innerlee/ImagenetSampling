@@ -11,7 +11,7 @@ namespace Imagenet
         static void Main(string[] args)
         {
             var m = new Manager();
-            m.ComputeLeafHeight();
+            m.Top100();
 
             Console.WriteLine("done.");
             Console.ReadLine();

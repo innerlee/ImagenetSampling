@@ -15,10 +15,74 @@ namespace Imagenet
         string imgpath = @"C:\imagenet_fall11_urls.txt";
         string lineno = @"D:\lineNo.txt";
         string linenoInt = @"D:\lineNoInt.txt";
+        string output = @"D:\";
         //List<string> lines;
         int capacity = 100000;
 
         int taken = 0;
+
+        class OutputHelper
+        {
+            public int line;
+            public string info;
+        }
+
+        
+
+        public void Top100()
+        {
+            var lines = new List<OutputHelper>();
+            var imgids = new List<OutputHelper>();
+            //var outSynList = new List<Synset>();
+            //var infos = new List<string>();
+            //var synsets = new List<Synset>();
+
+            var list = db.Synsets.Where(s => s.LeafHeight == 0).OrderByDescending(s => s.ImgCount.Value).Take(100).ToList();
+            foreach (var l in list)
+            {
+                var ids = db.ImgIds.Where(i => i.SynsetId == l.SynsetId).Take(1200)
+                    .Select(i => new OutputHelper { line = i.ImageId, info = l.Wnid + "\t" + l.Words }).ToList();
+                imgids.AddRange(ids);
+            }
+
+            lines = imgids.OrderBy(i => i.line).ToList();
+
+            var salt = DateTime.Now.ToString("MMddHHmmss-");
+            var outUrlFile = output + salt + "urls.txt";
+            var outSynsetFile = output + salt + "synsets.txt";
+            var outSynsetBriefFile = output + salt + "synsetsBrief.txt";
+
+
+            string line;
+            var counter = 1;
+            var j = 0;
+            // Read the file and display it line by line.
+            System.IO.StreamReader file = new System.IO.StreamReader(imgpath);
+            //System.IO.StreamWriter outUrl = new System.IO.StreamWriter(outUrlFile, false);
+            System.IO.StreamWriter outSynset = new System.IO.StreamWriter(outSynsetFile, false);
+            System.IO.StreamWriter outSynsetBrief = new System.IO.StreamWriter(outSynsetBriefFile, false);
+
+            foreach (var item in list)
+            {
+                outSynsetBrief.WriteLine(item.Wnid + "\t[" + item.Level.ToString() + "|" + item.LeafHeight.ToString() + "][" + item.ImgCount.ToString() + "] \t" + item.Words + "\t(" + item.Glosses + ")");
+            }
+            outSynsetBrief.Flush();
+
+            while ((line = file.ReadLine()) != null && j < lines.Count)
+            {
+                if ((counter++) != lines[j].line) continue;
+                var split = line.Split(new char[] { '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                if (split.Count() != 2) continue;
+                //outUrl.WriteLine(split[1]);
+                outSynset.WriteLine(split[0] + "\t" + lines[j].info + "\t" + split[1]);
+                ++j;
+            }
+            //outUrl.Flush();
+            outSynset.Flush();
+
+            file.Close();
+
+        }
 
         public void InitLeafHeight()
         {

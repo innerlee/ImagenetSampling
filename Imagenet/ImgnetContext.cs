@@ -46,9 +46,9 @@ namespace Imagenet
         [ForeignKey("ParentId")]
         public virtual Synset Parent { get; set; }
         [InverseProperty("Parent")]
-        public List<Synset> Children { get; set; }
+        public virtual List<Synset> Children { get; set; }
         [InverseProperty("Synset")]
-        public List<Image> Images { get; set; }
+        public virtual List<Image> Images { get; set; }
         //[InverseProperty("Synset")]
         //public List<SynId> SynIds { get; set; }
     }
