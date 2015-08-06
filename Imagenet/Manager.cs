@@ -138,7 +138,7 @@ namespace Imagenet
 
             foreach (var item in list)
             {
-                outUrl.WriteLine($"http://www.image-net.org/download/synset?wnid={item.Wnid}&username=innerleees&accesskey=f9fe89003dc2e72798faafcc2444b01086415eff&release=latest&src=stanford");
+                outUrl.WriteLine($"http://www.image-net.org/download/synset?wnid={item.Wnid}&username=innerleees&accesskey=f9fe89003dc2e72798faafcc2444b01086415effes&release=latest&src=stanford");
                 outSynsetBrief.WriteLine(item.Wnid + "\t[" + item.Level.ToString() + "|" + item.LeafHeight.ToString() + "][" + item.ImgCount.ToString() + "] \t" + item.Words + "\t(" + item.Glosses + ")");
             }
             outUrl.Flush();
