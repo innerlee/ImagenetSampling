@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using EntityFramework.BulkInsert.Extensions;
 using System.IO;
+using System.Collections.Concurrent;
+using System.Net;
 
 namespace Imagenet
 {
@@ -31,9 +33,30 @@ namespace Imagenet
 
         public void DownloadImages(string file)
         {
+            if (file == "") file = @"";
+
             var salt = DateTime.Now.ToString("MMddHHmmss");
             var baseDir = imgdir + salt + "\\";
             Directory.CreateDirectory(baseDir);
+
+            string[] lines = System.IO.File.ReadAllLines(file);
+            var imgs = lines.Select(l => new ImgId { SynsetId = int.Parse(l) }).ToList();
+
+            // Create queue of WebClient instances
+            BlockingCollection<WebClient> ClientQueue = new BlockingCollection<WebClient>();
+            // Initialize queue with some number of WebClient instances
+            ClientQueue.Add(new WebClient());
+            ClientQueue.Add(new WebClient());
+            ClientQueue.Add(new WebClient());
+            ClientQueue.Add(new WebClient());
+            ClientQueue.Add(new WebClient());
+
+            //// now process urls
+            //foreach (var url in urls_to_download)
+            //{
+            //    var worker = ClientQueue.Take();
+            //    worker.DownloadStringAsync(url, ...);
+            //}
 
         }
 
@@ -45,15 +68,58 @@ namespace Imagenet
             //var infos = new List<string>();
             //var synsets = new List<Synset>();
 
-            var list = db.Synsets.Where(s => s.LeafHeight == 0).OrderByDescending(s => s.ImgCount.Value).Take(100).ToList();
+            var list = db.Synsets.Where(s => s.LeafHeight == 0).OrderByDescending(s => s.ImgCount.Value).Take(10).ToList();
             foreach (var l in list)
             {
-                var ids = db.ImgIds.Where(i => i.SynsetId == l.SynsetId).Take(1200)
+                var ids = db.ImgIds.Where(i => i.SynsetId == l.SynsetId).Take(12)
                     .Select(i => new OutputHelper { line = i.ImageId, info = l.Wnid + "\t" + l.Words }).ToList();
                 imgids.AddRange(ids);
             }
 
             lines = imgids.OrderBy(i => i.line).ToList();
+
+            WriteFiles(list, lines);
+
+        }
+
+        public void Random100()
+        {
+            var low = 800;
+            var up = 1200;
+            var take = 100;
+            var size = 1200;
+            var r = new Random();
+
+            var tot = db.Synsets.Where(s => s.ImgCount > low && s.ImgCount < up).ToList();
+            if (tot.Count > take)
+            {
+                for (int i = 0; i < take; i++)
+                {
+                    var temp = tot[i];
+                    var j = r.Next(tot.Count);
+                    tot[i] = tot[j];
+                    tot[j] = temp;
+                }
+            }
+
+            var list = tot.Take(take).ToList();
+
+            var lines = new List<OutputHelper>();
+            var imgids = new List<OutputHelper>();
+            foreach (var l in list)
+            {
+                var ids = db.ImgIds.Where(i => i.SynsetId == l.SynsetId).Take(size)
+                    .Select(i => new OutputHelper { line = i.ImageId, info = l.Wnid + "\t" + l.Words }).ToList();
+                imgids.AddRange(ids);
+            }
+            lines = imgids.OrderBy(i => i.line).ToList();
+
+            WriteFiles(list, lines);
+
+        }
+
+        void WriteFiles(List<Synset> list, List<OutputHelper> lines)
+        {
 
             var salt = DateTime.Now.ToString("MMddHHmmss-");
             var outUrlFile = output + salt + "urls.txt";
@@ -66,14 +132,16 @@ namespace Imagenet
             var j = 0;
             // Read the file and display it line by line.
             System.IO.StreamReader file = new System.IO.StreamReader(imgpath);
-            //System.IO.StreamWriter outUrl = new System.IO.StreamWriter(outUrlFile, false);
+            System.IO.StreamWriter outUrl = new System.IO.StreamWriter(outUrlFile, false);
             System.IO.StreamWriter outSynset = new System.IO.StreamWriter(outSynsetFile, false);
             System.IO.StreamWriter outSynsetBrief = new System.IO.StreamWriter(outSynsetBriefFile, false);
 
             foreach (var item in list)
             {
+                outUrl.WriteLine($"http://www.image-net.org/download/synset?wnid={item.Wnid}&username=innerlee&accesskey=f9fe89003dc2e72798faafcc2444b01086415eff&release=latest&src=stanford");
                 outSynsetBrief.WriteLine(item.Wnid + "\t[" + item.Level.ToString() + "|" + item.LeafHeight.ToString() + "][" + item.ImgCount.ToString() + "] \t" + item.Words + "\t(" + item.Glosses + ")");
             }
+            outUrl.Flush();
             outSynsetBrief.Flush();
 
             while ((line = file.ReadLine()) != null && j < lines.Count)
@@ -81,15 +149,12 @@ namespace Imagenet
                 if ((counter++) != lines[j].line) continue;
                 var split = line.Split(new char[] { '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
                 if (split.Count() != 2) continue;
-                //outUrl.WriteLine(split[1]);
                 outSynset.WriteLine(split[0] + "\t" + lines[j].info + "\t" + split[1]);
                 ++j;
             }
-            //outUrl.Flush();
             outSynset.Flush();
 
             file.Close();
-
         }
 
         public void InitLeafHeight()
