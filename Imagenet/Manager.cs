@@ -36,6 +36,17 @@ namespace Imagenet
             public string info;
         }
 
+        public void BatchResizeSubfolders(string path)
+        {
+            if (path == "") path = @"D:\testimg\";
+            var folders = Directory.GetDirectories(path);
+            foreach (var f in folders)
+            {
+                Console.WriteLine($"== In folder {f}");
+                BatchResizeImg(f);
+            }
+        }
+
         public void BatchResizeImg(string path)
         {
             if (path == "") path = @"D:\testimg\";
@@ -43,7 +54,10 @@ namespace Imagenet
             foreach (var f in files)
             {
                 ResizeImg(f);
+                Console.Write(".");
+                //Console.WriteLine($"file: {f}");
             }
+            Console.WriteLine();
         }
 
         public void ResizeImg(string file)
@@ -65,35 +79,34 @@ namespace Imagenet
                 {
                     var w = img.Width;
                     var h = img.Height;
-                    if (w > minDimMax && h > minDimMax)
+                    //if (w > minDimMax && h > minDimMax)
+                    //{
+                    // Format is automatically detected though can be changed.
+                    ISupportedImageFormat format = new JpegFormat { Quality = 90 };
+
+                    Size size1 = new Size(minDimMax, minDimMax * 10);
+                    Size size2 = new Size(minDimMax * 10, minDimMax);
+
+                    var resize1 = new ResizeLayer(size1, ResizeMode.Max);
+                    var resize2 = new ResizeLayer(size2, ResizeMode.Max);
+                    ResizeLayer layer = w < h ? resize1 : resize2;
+                    using (MemoryStream outStream = new MemoryStream())
                     {
-                        // Format is automatically detected though can be changed.
-                        ISupportedImageFormat format = new JpegFormat { Quality = 70 };
-
-                        Size size1 = new Size(minDimMax, minDimMax * 10);
-                        Size size2 = new Size(minDimMax * 10, minDimMax);
-
-                        var resize1 = new ResizeLayer(size1, ResizeMode.Max, upscale: false);
-                        var resize2 = new ResizeLayer(size2, ResizeMode.Max, upscale: false);
-                        ResizeLayer layer = resize1;
-                        layer = w < h ? resize1 : resize2;
-                        using (MemoryStream outStream = new MemoryStream())
+                        // Initialize the ImageFactory using the overload to preserve EXIF metadata.
+                        using (ImageFactory imageFactory = new ImageFactory(preserveExifData: true))
                         {
-                            // Initialize the ImageFactory using the overload to preserve EXIF metadata.
-                            using (ImageFactory imageFactory = new ImageFactory(preserveExifData: true))
-                            {
-                                // Load, resize, set the format and quality and save an image.
-                                imageFactory.Load(inStream)
-                                            .Resize(layer)
-                                            .Format(format)
-                                            .Save(outfile);
-                            }
+                            // Load, resize, set the format and quality and save an image.
+                            imageFactory.Load(inStream)
+                                        .Resize(layer)
+                                        .Format(format)
+                                        .Save(outfile);
                         }
                     }
-                    else if (!replace)
-                    {
-                        File.Copy(file, outfile);
-                    }
+                    //}
+                    //else if (!replace)
+                    //{
+                    //    File.Copy(file, outfile);
+                    //}
                 }
 
             }
@@ -158,7 +171,7 @@ namespace Imagenet
             var size = 1200;
             var r = new Random();
 
-            var tot = db.Synsets.Where(s => s.ImgCount > low && s.ImgCount < up).ToList();
+            var tot = db.Synsets.Where(s => s.ImgCount > low && s.ImgCount < up && s.LeafHeight == 0).ToList();
             if (tot.Count > take)
             {
                 for (int i = 0; i < take; i++)

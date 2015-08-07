@@ -11,8 +11,16 @@ namespace Imagenet
         static void Main(string[] args)
         {
             var m = new Manager();
-            //m.Random100();
-            m.BatchResizeImg("");
+            m.Random100();
+
+
+            
+
+            //var path = "";
+            //if (args.Count() > 0)
+            //    path = args[0];
+
+            //m.BatchResizeSubfolders(path);
 
             Console.WriteLine("done.");
             Console.ReadLine();
