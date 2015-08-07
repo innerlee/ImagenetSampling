@@ -11,10 +11,10 @@ namespace Imagenet
         static void Main(string[] args)
         {
             var m = new Manager();
-            m.Random100();
+            //m.Random100();
 
+            m.OutputAllLeafsWithEnouphImgs();
 
-            
 
             //var path = "";
             //if (args.Count() > 0)

@@ -163,6 +163,27 @@ namespace Imagenet
 
         }
 
+        public void OutputAllLeafsWithEnouphImgs()
+        {
+            var low = 800;
+            var up = 1200;
+            var r = new Random();
+
+            var list = db.Synsets.Where(s => s.ImgCount > low && s.ImgCount < up && s.LeafHeight == 0).ToList();
+            Console.WriteLine($"total {list.Count} categories.");
+
+            var salt = DateTime.Now.ToString("MMddHHmmss-");
+            var outUrlFile = output + salt + "leafs.txt";
+
+            StreamWriter file = new StreamWriter(outUrlFile, false);
+            foreach (var s in list)
+            {
+                file.WriteLine($"{s.Wnid}\t({s.ImgCount})\t{s.Words}\t({s.Glosses})");
+            }
+            file.Flush();
+
+        }
+
         public void Random100()
         {
             var low = 800;
