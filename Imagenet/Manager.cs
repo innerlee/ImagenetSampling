@@ -163,6 +163,109 @@ namespace Imagenet
 
         }
 
+        class Node
+        {
+            public int id { get; set; }
+            public Node Parent { get; set; }
+            public string Wnid { get; set; }
+            public int Level { get; set; }
+            public bool Used { get; set; }
+            public string Word { get; set; }
+        }
+
+        public void GenerateMatlabTree()
+        {
+            var wnidpath = @"D:\imgnetimg\batch1\0806141731-synsetsBrief2.txt";
+            var salt = DateTime.Now.ToString("MMddHHmmss-");
+            var outFile = output + salt + "tree.txt";
+
+            var dict = new Dictionary<string, Node>();
+
+            string[] lines = File.ReadAllLines(wnidpath);
+            var nodes = lines.Select(l =>
+            {
+                var split = l.Split(new char[] { '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                if (split.Count() != 2) return new Node { Wnid = "" };
+                return new Node { Wnid = split[0], Used = true };
+            }).Where(s => s.Wnid != "").OrderBy(s => s.Wnid).ToList();
+
+            // load data from db.
+            var data = db.Synsets.ToList();
+
+            for (int i = nodes.Count - 1; i >= 0; i--)
+            {
+                var n = nodes[i];
+                var nn = data.Find(d => d.Wnid == n.Wnid);
+                if (nn == null)
+                {
+                    Console.WriteLine($"wrong wnid {n.Wnid}, removed it.");
+                    nodes.RemoveAt(i);
+                    continue;
+                }
+                n.Level = nn.Level ?? 0;
+                n.Word = nn.Words.Split(new char[] { ',' }, 2, StringSplitOptions.RemoveEmptyEntries)[0];
+                dict.Add(n.Wnid, n);
+            }
+
+            var counter = 0;
+            var cycle = 0;
+            do
+            {
+                counter = 0;
+                cycle++;
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    var n = nodes[i];
+                    if (n.Parent == null)
+                    {
+                        var nn = data.Find(d => d.Wnid == n.Wnid);
+                        if (nn == null)
+                        {
+                            Console.WriteLine($"wrong wnid {n.Wnid}, but keeping it.");
+                            continue;
+                        }
+                        Console.WriteLine($"cycle {cycle}, id {i}, {nn.Wnid}");
+                        if (nn.Parent == null)
+                        {
+                            Console.WriteLine($"cycle {cycle}, no parent for {n.Wnid}.");
+                            continue;
+                        }
+                        if (dict.ContainsKey(nn.Parent.Wnid))
+                        {
+                            n.Parent = dict[nn.Parent.Wnid];
+                        }
+                        else
+                        {
+                            var pnode = new Node
+                            {
+                                Wnid = nn.Parent.Wnid,
+                                Level = nn.Parent.Level ?? 0,
+                                Used = false,
+                                Word = nn.Parent.Words.Split(new char[] { ',' }, 2, StringSplitOptions.RemoveEmptyEntries)[0]
+                            };
+                            Console.WriteLine($"add {pnode.Wnid}");
+                            nodes.Add(pnode);
+                            n.Parent = pnode;
+                            dict.Add(pnode.Wnid, pnode);
+                        }
+                        counter++;
+                    }
+                }
+            } while (counter > 0);
+
+            StreamWriter outTree = new StreamWriter(outFile, false);
+            var treelist = nodes.OrderBy(n => n.Level).ToList();
+            for (int i = 0; i < treelist.Count; i++)
+            {
+                var n = treelist[i];
+                n.id = i + 1;
+                outTree.WriteLine($"{i + 1}\t{(n.Parent == null ? 0 : n.Parent.id)}\t{n.Wnid}\t{n.Word}");
+            }
+
+            outTree.Flush();
+
+        }
+
         public void OutputAllLeafsWithEnouphImgs()
         {
             var low = 800;
@@ -224,26 +327,29 @@ namespace Imagenet
         {
 
             var salt = DateTime.Now.ToString("MMddHHmmss-");
-            var outUrlFile = output + salt + "urls.txt";
-            var outSynsetFile = output + salt + "synsets.txt";
-            var outSynsetBriefFile = output + salt + "synsetsBrief.txt";
-
+            var outDownLinkFile = output + salt + "downlink.txt";
+            var outImgUrlFile = output + salt + "imgurl.txt";
+            var outSynsetsFile = output + salt + "synsets.txt";
+            var outSynsetBriefFile = output + salt + "synsetBrief.txt";
 
             string line;
             var counter = 1;
             var j = 0;
             // Read the file and display it line by line.
             System.IO.StreamReader file = new System.IO.StreamReader(imgpath);
-            System.IO.StreamWriter outUrl = new System.IO.StreamWriter(outUrlFile, false);
-            System.IO.StreamWriter outSynset = new System.IO.StreamWriter(outSynsetFile, false);
+            System.IO.StreamWriter outDown = new System.IO.StreamWriter(outDownLinkFile, false);
+            System.IO.StreamWriter outImg = new System.IO.StreamWriter(outImgUrlFile, false);
+            System.IO.StreamWriter outSynsets = new System.IO.StreamWriter(outSynsetsFile, false);
             System.IO.StreamWriter outSynsetBrief = new System.IO.StreamWriter(outSynsetBriefFile, false);
 
             foreach (var item in list)
             {
-                outUrl.WriteLine($"http://www.image-net.org/download/synset?wnid={item.Wnid}&username=innerleees&accesskey=f9fe89003dc2e72798faafcc2444b01086415effes&release=latest&src=stanford");
-                outSynsetBrief.WriteLine(item.Wnid + "\t[" + item.Level.ToString() + "|" + item.LeafHeight.ToString() + "][" + item.ImgCount.ToString() + "] \t" + item.Words + "\t(" + item.Glosses + ")");
+                outDown.WriteLine($"http://www.image-net.org/download/synset?wnid={item.Wnid}&username=innerleees&accesskey=f9fe89003dc2e72798faafcc2444b01086415effes&release=latest&src=stanford");
+                outSynsets.WriteLine(item.Wnid + "\t[" + item.Level.ToString() + "|" + item.LeafHeight.ToString() + "][" + item.ImgCount.ToString() + "] \t" + item.Words + "\t(" + item.Glosses + ")");
+                outSynsetBrief.WriteLine($"{item.Wnid}\t{item.Words.Split(new char[] { ',' }, 2, StringSplitOptions.RemoveEmptyEntries)[0]}");
             }
-            outUrl.Flush();
+            outDown.Flush();
+            outSynsets.Flush();
             outSynsetBrief.Flush();
 
             while ((line = file.ReadLine()) != null && j < lines.Count)
@@ -251,10 +357,10 @@ namespace Imagenet
                 if ((counter++) != lines[j].line) continue;
                 var split = line.Split(new char[] { '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
                 if (split.Count() != 2) continue;
-                outSynset.WriteLine(split[0] + "\t" + lines[j].info + "\t" + split[1]);
+                outImg.WriteLine(split[0] + "\t" + lines[j].info + "\t" + split[1]);
                 ++j;
             }
-            outSynset.Flush();
+            outImg.Flush();
 
             file.Close();
         }

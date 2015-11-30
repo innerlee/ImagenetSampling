@@ -13,7 +13,7 @@ namespace Imagenet
             var m = new Manager();
             //m.Random100();
 
-            m.OutputAllLeafsWithEnouphImgs();
+            //m.OutputAllLeafsWithEnouphImgs();
 
 
             //var path = "";
@@ -21,6 +21,7 @@ namespace Imagenet
             //    path = args[0];
 
             //m.BatchResizeSubfolders(path);
+            m.GenerateMatlabTree();
 
             Console.WriteLine("done.");
             Console.ReadLine();
