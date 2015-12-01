@@ -10,7 +10,15 @@ namespace Imagenet
     {
         static void Main(string[] args)
         {
+            // organize all the tasks.
             var m = new Manager();
+
+            // TASK1: list all wnids
+            // TASK2: filter wnids by counts
+            // TASK3: output download links
+            m.Top100();
+
+
             //m.Random100();
 
             //m.OutputAllLeafsWithEnouphImgs();
@@ -21,7 +29,7 @@ namespace Imagenet
             //    path = args[0];
 
             //m.BatchResizeSubfolders(path);
-            m.GenerateMatlabTree();
+            //m.GenerateMatlabTree();
 
             Console.WriteLine("done.");
             Console.ReadLine();

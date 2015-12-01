@@ -20,11 +20,11 @@ namespace Imagenet
     {
         ImgnetContext db = new ImgnetContext();
         string path = @"D:\Backup\Source\Repos\Imagenet\Imagenet\Imagenet\data\";
-        string imgpath = @"C:\imagenet_fall11_urls.txt";
-        string lineno = @"D:\lineNo.txt";
-        string linenoInt = @"D:\lineNoInt.txt";
-        string output = @"D:\";
-        string imgdir = @"D:\imgnetimg\";
+        string imgpath = @"D:\imgnet_data\imagenet_fall11_urls.txt";
+        string lineno = @"D:\imgnet_data\lineNo.txt";
+        string linenoInt = @"D:\imgnet_data\output\lineNoInt.txt";
+        string output = @"D:\imgnet_data\output\";
+        string imgdir = @"D:\imgnet_data\imgnetimg\";
         //List<string> lines;
         int capacity = 100000;
 
@@ -149,7 +149,7 @@ namespace Imagenet
             //var infos = new List<string>();
             //var synsets = new List<Synset>();
 
-            var list = db.Synsets.Where(s => s.LeafHeight == 0).OrderByDescending(s => s.ImgCount.Value).Take(10).ToList();
+            var list = db.Synsets.Where(s => s.LeafHeight == 0).Where(s => s.ImgCount > 1600).OrderByDescending(s => s.ImgCount.Value).Take(10000).ToList();
             foreach (var l in list)
             {
                 var ids = db.ImgIds.Where(i => i.SynsetId == l.SynsetId).Take(12)
@@ -287,6 +287,9 @@ namespace Imagenet
 
         }
 
+        /// <summary>
+        /// output the most fat wnids.
+        /// </summary>
         public void Random100()
         {
             var low = 800;
@@ -323,6 +326,11 @@ namespace Imagenet
 
         }
 
+        /// <summary>
+        /// write wnid related files
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="lines"></param>
         void WriteFiles(List<Synset> list, List<OutputHelper> lines)
         {
 
@@ -365,6 +373,7 @@ namespace Imagenet
             file.Close();
         }
 
+        #region leaf height & total count of wnids
         public void InitLeafHeight()
         {
             var list = db.Synsets.ToList();
@@ -460,7 +469,6 @@ namespace Imagenet
 
         }
 
-
         public void BatchAddImageIntVersion()
         {
             var filename = linenoInt;
@@ -479,6 +487,7 @@ namespace Imagenet
             }
             db.BulkInsert(imgs.GetRange(i * capacity, imgs.Count % capacity));
         }
+        #endregion
 
         //private void ProcessLinesOfImgs(List<string> lines)
         //{
@@ -605,7 +614,6 @@ namespace Imagenet
             Console.ReadLine();
 
         }
-
 
         public void ProcessBigFile()
         {
@@ -751,7 +759,6 @@ namespace Imagenet
             db.Synsets.AddRange(synsets);
             db.SaveChanges();
         }
-
 
         public void AddIsAvailable()
         {
